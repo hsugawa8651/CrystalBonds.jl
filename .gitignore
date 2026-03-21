@@ -1,0 +1,38 @@
+# Julia package artifacts
+Manifest.toml
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+
+# Documentation build
+docs/build/
+docs/site/
+
+# Test artifacts
+/test/Manifest.toml
+
+# IDE and editors
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+
+# Coverage
+/coverage/
+lcov.info
+
+# Example output artifacts
+examples/*.png
+examples/wannier_work/
+
+# AI tools
+CLAUDE.md
+.claude/
+.gemini/
+
+# Paper build artifacts
+paper/paper.pdf
+
+# Preserve empty directory structure
+!.gitkeep
