@@ -73,6 +73,13 @@ wohp = compute(WOHP(), Hk, evals, evecs; E_range, method = GaussianSmearing(0.15
 woop = compute(WOOP(), Hk, evals, evecs; E_range, method = GaussianSmearing(0.15))
 
 cc_wohp = extract_bond(wohp, 1:4, 5:8)
+
+# Orbital decomposition: C1(s=1, p=2:4) - C2(s=5, p=6:8)
+wohp_ss = wohp.matrix[1, 5, :]
+wohp_sp = dropdims(sum(wohp.matrix[1:1, 6:8, :]; dims = (1, 2)); dims = (1, 2))
+wohp_ps = dropdims(sum(wohp.matrix[2:4, 5:5, :]; dims = (1, 2)); dims = (1, 2))
+wohp_pp = dropdims(sum(wohp.matrix[2:4, 6:8, :]; dims = (1, 2)); dims = (1, 2))
+
 icohp = integrate(wohp, eF_eV)
 println("IpCOHP at E_F: $(round(icohp, digits=4))")
 
@@ -86,9 +93,14 @@ try
     hlines!(ax1, [eF_eV]; color = :gray, linestyle = :dot)
 
     ax2 = Axis(fig[1, 2]; xlabel = "WOHP", ylabel = "E (eV)", title = "Diamond C-C WOHP")
-    lines!(ax2, cc_wohp, E_range; color = :black, linewidth = 2)
+    lines!(ax2, cc_wohp, E_range; color = :black, linewidth = 2, label = "total")
+    lines!(ax2, wohp_ss, E_range; color = :red, linewidth = 1, label = "s-s")
+    lines!(ax2, wohp_sp, E_range; color = :green, linewidth = 1, label = "s-p")
+    lines!(ax2, wohp_ps, E_range; color = :orange, linewidth = 1, label = "p-s")
+    lines!(ax2, wohp_pp, E_range; color = :blue, linewidth = 1, label = "p-p")
     vlines!(ax2, [0]; color = :black, linestyle = :dash, linewidth = 0.5)
     hlines!(ax2, [eF_eV]; color = :gray, linestyle = :dot)
+    axislegend(ax2; position = :lb, labelsize = 10)
     linkyaxes!(ax1, ax2)
 
     outfile = joinpath(@__DIR__, "210_diamond_dftk_pbe.png")
