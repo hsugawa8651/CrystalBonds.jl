@@ -3,6 +3,7 @@
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://hsugawa8651.github.io/CrystalBonds.jl/stable/)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://hsugawa8651.github.io/CrystalBonds.jl/dev/)
 [![CI](https://github.com/hsugawa8651/CrystalBonds.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/hsugawa8651/CrystalBonds.jl/actions/workflows/CI.yml)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19494353.svg)](https://doi.org/10.5281/zenodo.19494353)
 
 Chemical bonding analysis for crystalline materials in Julia.
 
