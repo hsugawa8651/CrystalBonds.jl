@@ -17,7 +17,7 @@ makedocs(;
         prettyurls = get(ENV, "CI", "false") == "true",
     ),
     repo = "https://github.com/hsugawa8651/CrystalBonds.jl",
-    warnonly = true,
+    warnonly = false,
 )
 
 deploydocs(;
