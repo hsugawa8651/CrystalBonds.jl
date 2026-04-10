@@ -16,6 +16,6 @@ makedocs(;
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
     ),
-    repo = "https://github.com/example/CrystalBonds.jl",
+    repo = "https://github.com/hsugawa8651/CrystalBonds.jl",
     warnonly = true,
 )
