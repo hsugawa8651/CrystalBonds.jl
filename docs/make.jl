@@ -11,6 +11,7 @@ makedocs(;
         "Home" => "index.md",
         "Quick Start" => "guide.md",
         "Theory" => "theory.md",
+        "Examples" => "examples.md",
         "Generating _hr.dat" => "generating_hr_dat.md",
         "API Reference" => "api.md",
     ],

@@ -62,6 +62,19 @@ The relationship to the Deringer/LOBSTER convention is:
 When comparing with LOBSTER output, note that LOBSTER plots `-pCOHP`
 (positive = bonding), which matches WOHP directly.
 
+## Energy unit and origin
+
+The Wannier90 `_hr.dat` format uses eV as the energy unit.
+CrystalBonds.jl does not shift the energy origin.
+The zero point of the energy axis depends on the DFT code
+used to generate the Wannier90 output.
+
+- **DFTK.jl**: absolute DFT eigenvalues (Fermi energy available from `scfres.εF`)
+- **VASP / Quantum ESPRESSO + Wannier90**: typically referenced to the Fermi energy or vacuum level, depending on the calculation setup
+
+When comparing results across different codes or with literature,
+ensure the energy reference is consistent.
+
 ## Fourier interpolation
 
 The real-space Hamiltonian ``H(\mathbf{R})`` from Wannier90 is interpolated
