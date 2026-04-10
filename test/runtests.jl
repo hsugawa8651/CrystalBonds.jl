@@ -294,4 +294,43 @@ using Test
         @test isfinite(icohp)
         @test icohp > 0
     end
+
+    @testset "integrate boundary conditions (Diamond)" begin
+        fixture = joinpath(@__DIR__, "fixtures", "diamond_hr.dat")
+        HR, Rvectors, N = read_w90_hr(fixture)
+        n_wan = size(HR, 1)
+
+        nk = 10
+        kpoints = zeros(Float64, 3, nk^3)
+        let idx = 1
+            for i in 0:(nk - 1), j in 0:(nk - 1), kk in 0:(nk - 1)
+                kpoints[:, idx] = [i/nk, j/nk, kk/nk]
+                idx += 1
+            end
+        end
+
+        Hk = fourier_interpolate(HR, Rvectors, kpoints; N = N)
+        evals, evecs = diag_Hk(Hk)
+        E_range = collect(range(minimum(evals) - 2, maximum(evals) + 2; length = 200))
+        wohp = compute(WOHP(), Hk, evals, evecs;
+            E_range = E_range, method = GaussianSmearing(0.3))
+
+        gap_E = (maximum(evals[4, :]) + minimum(evals[5, :])) / 2
+
+        # IpCOHP below all bands should be ~0
+        @test abs(integrate(wohp, minimum(evals) - 10.0)) < 1e-10
+
+        # IpCOHP at mid-gap should be finite
+        @test isfinite(integrate(wohp, gap_E))
+
+        # IpCOHP above all bands should be finite
+        @test isfinite(integrate(wohp, maximum(evals) + 10.0))
+
+        # Bond-resolved IpCOHP (C-C) at mid-gap should be positive (net bonding)
+        cc_wohp = extract_bond(wohp, 1:4, 5:8)
+        dE = E_range[2] - E_range[1]
+        gap_idx = findlast(E_range .<= gap_E)
+        bond_icohp = sum(cc_wohp[1:gap_idx]) * dE
+        @test bond_icohp > 0
+    end
 end
