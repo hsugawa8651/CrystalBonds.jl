@@ -221,4 +221,77 @@ using Test
         icohp_low = integrate(wohp, minimum(evals) - 10.0)
         @test abs(icohp_low) < 1e-10
     end
+
+    @testset "read_w90_hr (GaAs)" begin
+        fixture = joinpath(@__DIR__, "fixtures", "gaas_hr.dat")
+        HR, Rvectors, N = read_w90_hr(fixture)
+
+        n_wan = size(HR, 1)
+        n_Rvecs = size(HR, 3)
+
+        @test n_wan == 8        # GaAs sp3: 2 atoms x 4 orbitals
+        @test n_Rvecs == 617
+        @test size(HR) == (n_wan, n_wan, n_Rvecs)
+        @test size(Rvectors) == (3, n_Rvecs)
+        @test length(N) == n_Rvecs
+        @test all(N .>= 1)
+
+        # R=0 must exist
+        R0_idx = findfirst(i -> all(Rvectors[:, i] .== 0), 1:n_Rvecs)
+        @test R0_idx !== nothing
+
+        # H(R=0) should be approximately Hermitian
+        H0 = HR[:, :, R0_idx]
+        @test H0 ≈ H0' atol=1e-10
+    end
+
+    @testset "compute WOHP/WOOP (GaAs)" begin
+        fixture = joinpath(@__DIR__, "fixtures", "gaas_hr.dat")
+        HR, Rvectors, N = read_w90_hr(fixture)
+        n_wan = size(HR, 1)
+
+        nk = 10
+        kpoints = zeros(Float64, 3, nk^3)
+        idx = 1
+        for i in 0:(nk - 1), j in 0:(nk - 1), kk in 0:(nk - 1)
+            kpoints[:, idx] = [i/nk, j/nk, kk/nk]
+            idx += 1
+        end
+
+        Hk = fourier_interpolate(HR, Rvectors, kpoints; N = N)
+        evals, evecs = diag_Hk(Hk)
+
+        E_range = collect(range(minimum(evals) - 2, maximum(evals) + 2; length = 200))
+        sigma = 0.3
+
+        # WOOP (= DOS)
+        woop = compute(WOOP(), Hk, evals, evecs;
+            E_range = E_range, method = GaussianSmearing(sigma))
+
+        # DOS >= 0 everywhere
+        @test all(woop.total .>= -1e-15)
+
+        # DOS integral = n_wannier (particle conservation)
+        dE = E_range[2] - E_range[1]
+        dos_integral = sum(woop.total) * dE
+        @test dos_integral ≈ n_wan atol=0.1
+
+        # WOHP
+        wohp = compute(WOHP(), Hk, evals, evecs;
+            E_range = E_range, method = GaussianSmearing(sigma))
+
+        @test size(wohp.matrix) == (n_wan, n_wan, length(E_range))
+
+        # Ga-As bond (orbitals 1:4 = Ga, 5:8 = As) should be net bonding below gap
+        gaas_wohp = extract_bond(wohp, 1:4, 5:8)
+        gap_E = (maximum(evals[4, :]) + minimum(evals[5, :])) / 2
+        below_gap = E_range .< gap_E
+        bonding_sum = sum(gaas_wohp[below_gap]) * dE
+        @test bonding_sum > 0  # net bonding below gap
+
+        # IpCOHP at mid-gap should be positive and finite
+        icohp = integrate(wohp, gap_E)
+        @test isfinite(icohp)
+        @test icohp > 0
+    end
 end
