@@ -19,3 +19,8 @@ makedocs(;
     repo = "https://github.com/hsugawa8651/CrystalBonds.jl",
     warnonly = true,
 )
+
+deploydocs(;
+    repo = "github.com/hsugawa8651/CrystalBonds.jl",
+    devbranch = "main",
+)
