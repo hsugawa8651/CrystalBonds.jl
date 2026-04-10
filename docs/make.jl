@@ -10,6 +10,7 @@ makedocs(;
     pages = [
         "Home" => "index.md",
         "Quick Start" => "guide.md",
+        "Theory" => "theory.md",
         "Generating _hr.dat" => "generating_hr_dat.md",
         "API Reference" => "api.md",
     ],
