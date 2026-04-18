@@ -15,7 +15,7 @@ bonding/antibonding analysis for crystals.
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/hsugawa8651/CrystalBonds.jl")
+Pkg.add("CrystalBonds")
 ```
 
 ## Quick example

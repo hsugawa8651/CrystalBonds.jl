@@ -1,7 +1,7 @@
 name = "CrystalBonds"
 uuid = "5d95cc45-87af-4e25-a5eb-db5677fad510"
 authors = ["Hiroharu Sugawara"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
